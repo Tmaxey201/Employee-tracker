@@ -4,6 +4,8 @@ CREATE DATABASE employee_db;
 
 USE employee_db;
 
+
+-- create tables
 CREATE TABLE department (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(30),
@@ -29,3 +31,7 @@ CREATE TABLE employee (
     FOREIGN KEY (manager_id) REFERENCES employee(id),
     PRIMARY KEY (id)
 )
+
+-- add value into tables
+
+ 
