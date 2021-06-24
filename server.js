@@ -156,3 +156,144 @@ function addRole(){
     })
 }
 
+async function addEmployee(){
+    connection.query('SELECT * FROM role', function(err, result){
+        if(err) throw (err);
+        inquirer
+        .prompt([{
+            name: "firstName",
+            type: "input",
+            message: "What is the employee's first name?",
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "What is the employee's last name?",
+        },
+        {
+            name: "roleName",
+            type: "list",
+            message: "What role does this employee have?",
+            choices: function(){
+                rolesArray = [];
+                result.forEach(result =>{
+                    rolesArray.push(
+                        result.title
+                    );
+                })
+                return rolesArray;
+            }
+        }
+    ])
+    .then(function(answer){
+        console.log(answer);
+        const role = answer.roleName;
+        connection.query('SELECT * FROM role', function(err, res){
+            if (err) throw(err);
+            let filteredRole = res.filter(function(res){
+                return res.title == role;
+            })
+            let roleId = filteredRole[0].id;
+            connection.query('SELECT * FROM employee', function(err, res){
+                inquirer
+                .prompt([
+                    {
+                    name: "manager",
+                    type: "list",
+                    message: "Who is your manager?",
+                    choices: function(){
+                        managerArray = []
+                        res.forEach(res =>{
+                            managerArray.push(
+                                res.last_name
+                            )
+                        })
+                        return managerArray;
+                    }
+                }
+                ])
+                .then(function(managerAnswer){
+                    const manager = managerAnswer.manager;
+                    connection.query('SELECT * FROM employee', function(err, res){
+                        if(err) throw (err);
+                        let filteredManager = res.filter(function(res){
+                            return res.last_name == manager;
+                        })
+                        let managerId = filteredManager[0].id;
+                        console.log(managerAnswer);
+                        let query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
+                        let values = [answer.firstName, answer.lastName, roleId, managerId]
+                        console.log(values);
+                        connection.query(query, values, function(err, res, fields){
+                            console.log(`You have added the employee: ${(values[0].toUpperCase())}.`)
+                        })
+                        viewEmployees();
+                    })
+                })
+            })
+        })
+    })
+    })
+}
+
+function updateRole(){
+    connection.query('SELECT * FROM employee', function(err, result){
+        if (err) throw(err);
+        inquirer
+        .prompt([
+            {
+                name: "employeeName",
+                type: "list",
+                message: "which employee's role would you like to change?",
+                choices: function(){
+                    employeeArray = [];
+                    result.forEach(result =>{
+                        employeeArray.push(
+                            result.last_name
+                        );
+                    })
+                    return employeeArray;
+                }
+            }
+        ])
+        .then(function(answer){
+            console.log(answer);
+            const name = answer.employeeName;
+            connection.query("SELECT * FROM role", function(err, res){
+                inquirer
+                .prompt ([
+                    {
+                        name: "role",
+                        type: "list",
+                        message: "What is their new role?",
+                        choices: function(){
+                            rolesArray = [];
+                            res.forEach(res => {
+                                rolesArray.push(
+                                    res.title
+                                )
+                            })
+                            return rolesArray;
+                        }
+                    }
+                ])
+                .then(function(rolesAnswer){
+                    const role = rolesAnswer.role;
+                    console.log(rolesAnswer.role);
+                    connection.query('SELECT * FROM role WHERE title = ?', [role], function(err, res){
+                        if (err) throw (err);
+                        let roleId = res[0].id;
+                        let query = "UPDATE employee SET role_id ? WHERE last_name ?";
+                        let values = [roleId, name]
+                        console.log(values);
+                        connection.query(query, values,
+                            function(err, res, fields){
+                                console.log(`You have updated ${name}'s role to ${role}.`)
+                            })
+                            viewEmployees();
+                    })
+                })
+            })
+        })
+    })
+}
