@@ -54,3 +54,16 @@ function start() {
         })
 }
 
+function viewDepartments(){
+    const query = "SELECT * FROM department ";
+        connection.query(query, function(err, res){
+            console.log(`DEPARTMENTS:`)
+            res.forEach(department => {
+                console.log(`ID: ${department.id} | Name: ${department.name}`);
+                
+            })
+            console.table(res)
+            start();
+        });
+};
+
