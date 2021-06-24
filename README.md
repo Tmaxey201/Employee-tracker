@@ -5,7 +5,7 @@ Developers are often tasked with creating interfaces that make it easy for non-d
 
 ## Video Walk-through
 
-[Employee-Tracker Video Walk-through]()
+[Employee-Tracker Video Walk-through](https://sampsoncorgi2-gmail.tinytake.com/tt/NTU0NTk5NF8xNzI4NDA5NQ)
 
 ## Instructions
 
